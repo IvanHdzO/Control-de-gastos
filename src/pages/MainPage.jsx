@@ -12,7 +12,7 @@ import ExpenseModal from "../components/ExpenseModal";
 import SavingsTab from "../components/SavingsTab";
 
 export default function MainPage() {
-  const { income, savingsGoalPct, loading: profileLoading, updateIncome, updateSavingsGoal } = useProfile();
+  const { income, savingsGoalPct, loading: profileLoading, updateIncome, updateSavingsGoal, resetProfile } = useProfile();
   const { expenses, loading: expensesLoading, addExpense, updateExpense, deleteExpense, resetAll } = useExpenses();
 
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -56,8 +56,9 @@ export default function MainPage() {
     setEditingExpense(null);
   };
 
-  const handleReset = async () => {
-    await resetAll();
+  const handleReset = () => {
+    resetAll();
+    resetProfile();
     setActiveTab("dashboard");
   };
 

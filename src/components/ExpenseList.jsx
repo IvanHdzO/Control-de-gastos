@@ -6,8 +6,8 @@ import styles from "../styles/styles";
 export default function ExpenseList({ expenses, onAddClick, onEdit, onDelete }) {
   return (
     <div style={styles.content}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <span style={styles.sectionTitle}>{expenses.length} gastos registrados</span>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+        <span style={styles.sectionTitle} className="r-section-title">{expenses.length} gastos registrados</span>
         <button onClick={onAddClick} style={styles.addBtn} className="btn-hover">
           <Plus size={14} style={{ marginRight: 6 }} />
           Agregar Gasto
@@ -38,14 +38,14 @@ export default function ExpenseList({ expenses, onAddClick, onEdit, onDelete }) 
                   <span style={{ fontFamily: "Space Mono", color: cat.color }}>{fmt(catTotal)}</span>
                 </div>
                 {items.map((exp) => (
-                  <div key={exp.id} className="expense-row" style={styles.expenseRow}>
-                    <div style={{ flex: 1 }}>
-                      <span style={styles.expName}>{exp.name}</span>
+                  <div key={exp.id} className="expense-row r-expense-row" style={styles.expenseRow}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ ...styles.expName, wordBreak: "break-word" }}>{exp.name}</span>
                       <span style={{ ...styles.priorityTag, background: PRIORITY_COLORS[exp.priority] + "22", color: PRIORITY_COLORS[exp.priority] }}>
                         {PRIORITY[exp.priority]}
                       </span>
                     </div>
-                    <span style={styles.expAmount}>{fmt(Number(exp.amount))}</span>
+                    <span style={styles.expAmount} className="r-exp-amount">{fmt(Number(exp.amount))}</span>
                     <button onClick={() => onEdit(exp)} style={styles.actionBtn} title="Editar"><Pencil size={13} /></button>
                     <button onClick={() => onDelete(exp.id)} className="delete-btn" style={{ ...styles.actionBtn, color: "#C44A4A" }} title="Eliminar"><Trash2 size={13} /></button>
                   </div>

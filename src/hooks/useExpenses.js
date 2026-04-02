@@ -1,95 +1,55 @@
-import { useState, useEffect, useCallback } from "react";
-import { supabase } from "../lib/supabase";
-import { useAuth } from "./useAuth";
+import { useState, useEffect } from "react";
+
+const STORAGE_KEY = "control-gastos-expenses";
 
 export function useExpenses() {
-  const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-    setLoading(true);
-    supabase
-      .from("expenses")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: true })
-      .then(({ data }) => {
-        setExpenses(data || []);
-        setLoading(false);
-      });
-  }, [user]);
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setExpenses(JSON.parse(saved));
+    } catch {}
+    setLoading(false);
+  }, []);
 
-  const addExpense = useCallback(async (expense) => {
-    if (!user) return;
-    const row = {
-      user_id: user.id,
-      name: expense.name,
-      amount: parseFloat(expense.amount),
-      category: expense.category,
-      priority: expense.priority,
-      recurring: expense.recurring,
-    };
-    const { data, error } = await supabase
-      .from("expenses")
-      .insert(row)
-      .select()
-      .single();
-    if (data) {
-      setExpenses((prev) => [...prev, data]);
-    }
-    return { data, error };
-  }, [user]);
+  const persist = (data) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {}
+  };
 
-  const updateExpense = useCallback(async (id, expense) => {
-    if (!user) return;
-    const updates = {
-      name: expense.name,
+  const addExpense = (expense) => {
+    const newExp = {
+      ...expense,
+      id: crypto.randomUUID(),
       amount: parseFloat(expense.amount),
-      category: expense.category,
-      priority: expense.priority,
-      recurring: expense.recurring,
+      created_at: new Date().toISOString(),
     };
-    // Optimistic update
-    setExpenses((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    const updated = [...expenses, newExp];
+    setExpenses(updated);
+    persist(updated);
+  };
+
+  const updateExpense = (id, expense) => {
+    const updated = expenses.map((e) =>
+      e.id === id ? { ...e, name: expense.name, amount: parseFloat(expense.amount), category: expense.category, priority: expense.priority, recurring: expense.recurring } : e
     );
-    const { error } = await supabase
-      .from("expenses")
-      .update(updates)
-      .eq("id", id)
-      .eq("user_id", user.id);
-    if (error) {
-      // Revert on error — refetch
-      const { data } = await supabase
-        .from("expenses")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: true });
-      setExpenses(data || []);
-    }
-  }, [user]);
+    setExpenses(updated);
+    persist(updated);
+  };
 
-  const deleteExpense = useCallback(async (id) => {
-    if (!user) return;
-    setExpenses((prev) => prev.filter((e) => e.id !== id));
-    await supabase
-      .from("expenses")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", user.id);
-  }, [user]);
+  const deleteExpense = (id) => {
+    const updated = expenses.filter((e) => e.id !== id);
+    setExpenses(updated);
+    persist(updated);
+  };
 
-  const resetAll = useCallback(async () => {
-    if (!user) return;
-    await supabase.from("expenses").delete().eq("user_id", user.id);
-    await supabase
-      .from("profiles")
-      .update({ income: 0, savings_goal_pct: 20, updated_at: new Date().toISOString() })
-      .eq("id", user.id);
+  const resetAll = () => {
     setExpenses([]);
-  }, [user]);
+    localStorage.removeItem(STORAGE_KEY);
+  };
 
   return { expenses, loading, addExpense, updateExpense, deleteExpense, resetAll };
 }

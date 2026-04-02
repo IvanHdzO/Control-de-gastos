@@ -9,7 +9,7 @@ const TABS = [
 
 export default function TabBar({ activeTab, onTabChange }) {
   return (
-    <div style={styles.tabs}>
+    <div style={styles.tabs} className="r-tabs">
       {TABS.map((t) => (
         <button
           key={t.id}

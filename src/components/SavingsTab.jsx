@@ -12,7 +12,7 @@ export default function SavingsTab({
       <div style={styles.section} className="card">
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <Target size={16} color="#4A9B7F" />
-          <span style={styles.sectionTitle}>Meta de Ahorro</span>
+          <span style={styles.sectionTitle} className="r-section-title">Meta de Ahorro</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 20, marginTop: 12 }}>
           <input
@@ -25,14 +25,14 @@ export default function SavingsTab({
           />
           <span style={{ fontFamily: "Space Mono", fontSize: 28, color: "#4A9B7F", minWidth: 70 }}>{savingsGoalPct}%</span>
         </div>
-        <div style={styles.grid2}>
+        <div style={styles.grid2} className="r-grid2">
           <div style={{ ...styles.miniCard, borderColor: "#4A9B7F" }}>
             <span style={styles.miniLabel}>Meta mensual</span>
-            <span style={{ ...styles.miniValue, color: "#4A9B7F" }}>{fmt(savingsGoal)}</span>
+            <span style={{ ...styles.miniValue, color: "#4A9B7F" }} className="r-mini-value">{fmt(savingsGoal)}</span>
           </div>
           <div style={{ ...styles.miniCard, borderColor: "#7CC6E8" }}>
             <span style={styles.miniLabel}>Meta anual</span>
-            <span style={{ ...styles.miniValue, color: "#7CC6E8" }}>{fmt(savingsGoal * 12)}</span>
+            <span style={{ ...styles.miniValue, color: "#7CC6E8" }} className="r-mini-value">{fmt(savingsGoal * 12)}</span>
           </div>
         </div>
         {income > 0 && (
@@ -50,7 +50,7 @@ export default function SavingsTab({
       <div style={styles.section} className="card">
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <Lightbulb size={16} color="#C49B4A" />
-          <span style={styles.sectionTitle}>Oportunidades de Ahorro</span>
+          <span style={styles.sectionTitle} className="r-section-title">Oportunidades de Ahorro</span>
         </div>
         {eliminable.length === 0 && reducible.length === 0 ? (
           <p style={styles.empty}>Marca gastos como "Eliminable" o "Reducible" para ver recomendaciones</p>
@@ -65,7 +65,7 @@ export default function SavingsTab({
                 {eliminable.map((e) => {
                   const cat = CATEGORIES.find((c) => c.id === e.category);
                   return (
-                    <div key={e.id} style={styles.oppRow}>
+                    <div key={e.id} style={styles.oppRow} className="r-opp-row">
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         {cat && <cat.Icon size={13} color={cat.color} strokeWidth={2} />}
                         <span>{e.name}</span>
@@ -78,14 +78,14 @@ export default function SavingsTab({
             )}
             {reducible.length > 0 && (
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
                   <span style={{ ...styles.dot, background: "#C49B4A" }} />
                   <span style={styles.oppTitle}>Gastos reducibles — ahorro estimado {fmt(reducible.reduce((s, e) => s + Number(e.amount) * 0.3, 0))}/mes</span>
                 </div>
                 {reducible.map((e) => {
                   const cat = CATEGORIES.find((c) => c.id === e.category);
                   return (
-                    <div key={e.id} style={styles.oppRow}>
+                    <div key={e.id} style={styles.oppRow} className="r-opp-row">
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         {cat && <cat.Icon size={13} color={cat.color} strokeWidth={2} />}
                         <span>{e.name} ({fmt(Number(e.amount))})</span>

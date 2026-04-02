@@ -1,53 +1,47 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { supabase } from "../lib/supabase";
-import { useAuth } from "./useAuth";
+import { useState, useEffect } from "react";
+
+const STORAGE_KEY = "control-gastos-profile";
 
 export function useProfile() {
-  const { user } = useAuth();
   const [income, setIncome] = useState(0);
   const [savingsGoalPct, setSavingsGoalPct] = useState(20);
   const [loading, setLoading] = useState(true);
-  const debounceRef = useRef(null);
 
   useEffect(() => {
-    if (!user) return;
-    setLoading(true);
-    supabase
-      .from("profiles")
-      .select("income, savings_goal_pct")
-      .eq("id", user.id)
-      .single()
-      .then(({ data, error }) => {
-        if (data) {
-          setIncome(Number(data.income));
-          setSavingsGoalPct(data.savings_goal_pct);
-        }
-        setLoading(false);
-      });
-  }, [user]);
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        setIncome(data.income ?? 0);
+        setSavingsGoalPct(data.savingsGoalPct ?? 20);
+      }
+    } catch {}
+    setLoading(false);
+  }, []);
 
-  const updateIncome = useCallback(async (value) => {
+  const persist = (inc, pct) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ income: inc, savingsGoalPct: pct }));
+    } catch {}
+  };
+
+  const updateIncome = (value) => {
     const numValue = parseFloat(value) || 0;
     setIncome(numValue);
-    if (!user) return;
-    await supabase
-      .from("profiles")
-      .update({ income: numValue, updated_at: new Date().toISOString() })
-      .eq("id", user.id);
-  }, [user]);
+    persist(numValue, savingsGoalPct);
+  };
 
-  const updateSavingsGoal = useCallback((value) => {
+  const updateSavingsGoal = (value) => {
     const intValue = parseInt(value);
     setSavingsGoalPct(intValue);
-    if (!user) return;
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      await supabase
-        .from("profiles")
-        .update({ savings_goal_pct: intValue, updated_at: new Date().toISOString() })
-        .eq("id", user.id);
-    }, 500);
-  }, [user]);
+    persist(income, intValue);
+  };
 
-  return { income, savingsGoalPct, loading, updateIncome, updateSavingsGoal };
+  const resetProfile = () => {
+    setIncome(0);
+    setSavingsGoalPct(20);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
+  return { income, savingsGoalPct, loading, updateIncome, updateSavingsGoal, resetProfile };
 }

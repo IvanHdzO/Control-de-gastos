@@ -31,7 +31,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, editingExpense }
 
   return (
     <div className="modal-overlay" style={styles.modalOverlay} onClick={onClose}>
-      <div className="modal-content" style={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content r-modal" style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <h3 style={styles.modalTitle}>{editingExpense ? "Editar Gasto" : "Nuevo Gasto"}</h3>
           <button onClick={onClose} style={{ ...styles.actionBtn, color: "#666" }}>
@@ -61,7 +61,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, editingExpense }
           </div>
           <div style={styles.formGroup}>
             <label style={styles.formLabel}>Categoría</label>
-            <div style={styles.categoryGrid}>
+            <div style={styles.categoryGrid} className="r-cat-grid">
               {CATEGORIES.map((c) => (
                 <button
                   key={c.id}
@@ -73,7 +73,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, editingExpense }
                   }}
                 >
                   <c.Icon size={14} color={form.category === c.id ? c.color : "#666"} strokeWidth={2} />
-                  <span style={{ fontSize: 10, color: form.category === c.id ? c.color : "#888", marginTop: 2 }}>{c.label}</span>
+                  <span className="r-cat-btn-label" style={{ fontSize: 10, color: form.category === c.id ? c.color : "#888", marginTop: 2 }}>{c.label}</span>
                 </button>
               ))}
             </div>

@@ -37,3 +37,117 @@ input:focus, select:focus, button:focus { outline: none; }
 .expense-row:hover .delete-btn { opacity: 1; }
 .modal-overlay { animation: fadeIn .2s ease; }
 .modal-content { animation: slideUp .3s ease; }
+
+/* ===== Responsive: Tablet (max-width: 768px) ===== */
+@media (max-width: 768px) {
+  .r-grid3 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .r-grid2 {
+    grid-template-columns: 1fr !important;
+  }
+  .r-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .r-header-right {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+  .r-income-bar {
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+  .r-income-divider {
+    display: none !important;
+  }
+  .r-income-right {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    border-top: 1px solid #222;
+    padding-top: 12px;
+  }
+  .r-legend-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .r-cat-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+  .r-cat-row-info {
+    min-width: unset !important;
+  }
+  .r-cat-row-amounts {
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+  .r-insight-card {
+    flex-direction: column !important;
+  }
+  .r-modal {
+    margin: 12px !important;
+    padding: 20px !important;
+    max-height: 95vh !important;
+  }
+  .r-cat-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .r-opp-row {
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+  .r-expense-row {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .r-expense-row .r-exp-amount {
+    min-width: unset !important;
+  }
+}
+
+/* ===== Responsive: Mobile (max-width: 480px) ===== */
+@media (max-width: 480px) {
+  .r-grid3 {
+    grid-template-columns: 1fr !important;
+  }
+  .r-title {
+    font-size: 20px !important;
+  }
+  .r-income-value {
+    font-size: 18px !important;
+  }
+  .r-card-value {
+    font-size: 16px !important;
+  }
+  .r-mini-value {
+    font-size: 18px !important;
+  }
+  .r-tabs .tab-btn {
+    padding: 8px 8px !important;
+    font-size: 11px !important;
+  }
+  .r-tabs .tab-btn svg {
+    display: none !important;
+  }
+  .r-cat-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 4px !important;
+  }
+  .r-cat-btn-label {
+    font-size: 8px !important;
+  }
+  .r-section-title {
+    font-size: 12px !important;
+  }
+  .r-progress-status {
+    display: none !important;
+  }
+  .delete-btn {
+    opacity: 1 !important;
+  }
+}
