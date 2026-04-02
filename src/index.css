@@ -108,6 +108,23 @@ input:focus, select:focus, button:focus { outline: none; }
   .r-expense-row .r-exp-amount {
     min-width: unset !important;
   }
+  .r-month-selector {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+  .r-history-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .r-history-label {
+    min-width: unset !important;
+  }
+  .r-history-stats {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+  }
 }
 
 /* ===== Responsive: Mobile (max-width: 480px) ===== */
@@ -133,6 +150,9 @@ input:focus, select:focus, button:focus { outline: none; }
   }
   .r-tabs .tab-btn svg {
     display: none !important;
+  }
+  .r-month-selector {
+    gap: 4px !important;
   }
   .r-cat-grid {
     grid-template-columns: repeat(3, 1fr) !important;

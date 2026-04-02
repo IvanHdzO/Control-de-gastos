@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { CATEGORIES } from "../lib/constants";
+import { getCurrentMonth } from "../lib/month";
 import { useProfile } from "../hooks/useProfile";
 import { useExpenses } from "../hooks/useExpenses";
 import { useBonuses } from "../hooks/useBonuses";
+import { useMonthlyHistory } from "../hooks/useMonthlyHistory";
 import styles from "../styles/styles";
 import Header from "../components/Header";
 import TabBar from "../components/TabBar";
@@ -11,11 +13,14 @@ import Dashboard from "../components/Dashboard";
 import ExpenseList from "../components/ExpenseList";
 import ExpenseModal from "../components/ExpenseModal";
 import SavingsTab from "../components/SavingsTab";
+import HistoryTab from "../components/HistoryTab";
 
 export default function MainPage() {
+  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth);
   const { income, income2, savingsGoalPct, loading: profileLoading, updateIncome, updateIncome2, updateSavingsGoal, resetProfile } = useProfile();
-  const { expenses, loading: expensesLoading, addExpense, updateExpense, deleteExpense, resetAll } = useExpenses();
-  const { bonuses, totalBonuses, loading: bonusesLoading, addBonus, deleteBonus, resetBonuses } = useBonuses();
+  const { expenses, loading: expensesLoading, addExpense, updateExpense, deleteExpense, resetAll } = useExpenses(currentMonth);
+  const { bonuses, totalBonuses, loading: bonusesLoading, addBonus, deleteBonus, resetBonuses } = useBonuses(currentMonth);
+  const { history, loading: historyLoading } = useMonthlyHistory(income, income2);
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showModal, setShowModal] = useState(false);
@@ -78,7 +83,7 @@ export default function MainPage() {
 
   return (
     <div style={styles.root}>
-      <Header />
+      <Header month={currentMonth} onMonthChange={setCurrentMonth} />
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
       <IncomeBar
         income={income}
@@ -137,6 +142,10 @@ export default function MainPage() {
           potentialSavings={potentialSavings}
           onReset={handleReset}
         />
+      )}
+
+      {activeTab === "historial" && (
+        <HistoryTab history={history} loading={historyLoading} />
       )}
     </div>
   );

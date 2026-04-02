@@ -75,6 +75,9 @@ const styles = {
   oppRow: { display: "flex", justifyContent: "space-between", padding: "8px 16px", fontSize: 13, color: "#aaa", borderBottom: "1px solid #1A1A1E" },
   resetBtn: { padding: "8px 20px", background: "transparent", border: "1px solid #333", borderRadius: 8, color: "#666", fontFamily: "'DM Sans'", fontSize: 12, cursor: "pointer", display: "inline-flex", alignItems: "center" },
   logoutBtn: { padding: "6px 12px", background: "transparent", border: "1px solid #333", borderRadius: 6, color: "#888", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans'", display: "flex", alignItems: "center", gap: 4 },
+  monthArrowBtn: { padding: "4px 6px", background: "rgba(255,255,255,.06)", border: "1px solid #333", borderRadius: 6, color: "#888", cursor: "pointer", display: "flex", alignItems: "center" },
+  monthTodayBtn: { padding: "4px 10px", background: "rgba(74,155,127,.15)", border: "1px solid rgba(74,155,127,.3)", borderRadius: 6, color: "#4A9B7F", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans'" },
+  historyRow: { display: "flex", alignItems: "center", gap: 16, padding: "14px 16px", background: "rgba(255,255,255,.02)", borderRadius: 10, border: "1px solid #1E1E22" },
 };
 
 export default styles;

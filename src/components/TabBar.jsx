@@ -1,10 +1,11 @@
-import { LayoutDashboard, List, PiggyBank } from "lucide-react";
+import { LayoutDashboard, List, PiggyBank, History } from "lucide-react";
 import styles from "../styles/styles";
 
 const TABS = [
   { id: "dashboard", label: "Dashboard", Icon: LayoutDashboard },
   { id: "gastos", label: "Mis Gastos", Icon: List },
   { id: "ahorro", label: "Ahorro", Icon: PiggyBank },
+  { id: "historial", label: "Historial", Icon: History },
 ];
 
 export default function TabBar({ activeTab, onTabChange }) {
