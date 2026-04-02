@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CATEGORIES } from "../lib/constants";
 import { useProfile } from "../hooks/useProfile";
 import { useExpenses } from "../hooks/useExpenses";
+import { useBonuses } from "../hooks/useBonuses";
 import styles from "../styles/styles";
 import Header from "../components/Header";
 import TabBar from "../components/TabBar";
@@ -12,17 +13,21 @@ import ExpenseModal from "../components/ExpenseModal";
 import SavingsTab from "../components/SavingsTab";
 
 export default function MainPage() {
-  const { income, savingsGoalPct, loading: profileLoading, updateIncome, updateSavingsGoal, resetProfile } = useProfile();
+  const { income, income2, savingsGoalPct, loading: profileLoading, updateIncome, updateIncome2, updateSavingsGoal, resetProfile } = useProfile();
   const { expenses, loading: expensesLoading, addExpense, updateExpense, deleteExpense, resetAll } = useExpenses();
+  const { bonuses, totalBonuses, loading: bonusesLoading, addBonus, deleteBonus, resetBonuses } = useBonuses();
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showModal, setShowModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
 
+  // Total income = both salaries + bonuses
+  const totalIncome = income + income2 + totalBonuses;
+
   // Derived values
   const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount), 0);
-  const savingsGoal = income * (savingsGoalPct / 100);
-  const remaining = income - totalExpenses;
+  const savingsGoal = totalIncome * (savingsGoalPct / 100);
+  const remaining = totalIncome - totalExpenses;
   const annualSavings = remaining * 12;
   const onTrack = remaining >= savingsGoal;
 
@@ -56,13 +61,14 @@ export default function MainPage() {
     setEditingExpense(null);
   };
 
-  const handleReset = () => {
-    resetAll();
+  const handleReset = async () => {
+    await resetAll();
+    await resetBonuses();
     resetProfile();
     setActiveTab("dashboard");
   };
 
-  if (profileLoading || expensesLoading) {
+  if (profileLoading || expensesLoading || bonusesLoading) {
     return (
       <div style={styles.loading}>
         <div style={styles.spinner} />
@@ -74,7 +80,18 @@ export default function MainPage() {
     <div style={styles.root}>
       <Header />
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
-      <IncomeBar income={income} remaining={remaining} onUpdateIncome={updateIncome} />
+      <IncomeBar
+        income={income}
+        income2={income2}
+        totalBonuses={totalBonuses}
+        totalIncome={totalIncome}
+        remaining={remaining}
+        onUpdateIncome={updateIncome}
+        onUpdateIncome2={updateIncome2}
+        bonuses={bonuses}
+        onAddBonus={addBonus}
+        onDeleteBonus={deleteBonus}
+      />
 
       {activeTab === "dashboard" && (
         <Dashboard
@@ -85,7 +102,7 @@ export default function MainPage() {
           annualSavings={annualSavings}
           onTrack={onTrack}
           byCategory={byCategory}
-          income={income}
+          income={totalIncome}
           potentialSavings={potentialSavings}
         />
       )}
@@ -112,7 +129,7 @@ export default function MainPage() {
           savingsGoalPct={savingsGoalPct}
           onSavingsGoalChange={updateSavingsGoal}
           savingsGoal={savingsGoal}
-          income={income}
+          income={totalIncome}
           remaining={remaining}
           onTrack={onTrack}
           eliminable={eliminable}
