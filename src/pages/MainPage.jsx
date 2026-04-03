@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CATEGORIES } from "../lib/constants";
 import { getCurrentMonth } from "../lib/month";
 import { useProfile } from "../hooks/useProfile";
+import { useSalaries } from "../hooks/useSalaries";
 import { useExpenses } from "../hooks/useExpenses";
 import { useBonuses } from "../hooks/useBonuses";
 import { useMonthlyHistory } from "../hooks/useMonthlyHistory";
@@ -17,17 +18,18 @@ import HistoryTab from "../components/HistoryTab";
 
 export default function MainPage() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth);
-  const { income, income2, savingsGoalPct, loading: profileLoading, updateIncome, updateIncome2, updateSavingsGoal, resetProfile } = useProfile();
+  const { savingsGoalPct, loading: profileLoading, updateSavingsGoal, resetProfile } = useProfile();
+  const { salaries, totalSalaries, loading: salariesLoading, addSalary, updateSalary, deleteSalary, resetSalaries } = useSalaries();
   const { expenses, loading: expensesLoading, addExpense, updateExpense, deleteExpense, resetAll } = useExpenses(currentMonth);
   const { bonuses, totalBonuses, loading: bonusesLoading, addBonus, deleteBonus, resetBonuses } = useBonuses(currentMonth);
-  const { history, loading: historyLoading } = useMonthlyHistory(income, income2);
+  const { history, loading: historyLoading } = useMonthlyHistory(totalSalaries);
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showModal, setShowModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
 
-  // Total income = both salaries + bonuses
-  const totalIncome = income + income2 + totalBonuses;
+  // Total income = all salaries + bonuses
+  const totalIncome = totalSalaries + totalBonuses;
 
   // Derived values
   const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount), 0);
@@ -69,11 +71,12 @@ export default function MainPage() {
   const handleReset = async () => {
     await resetAll();
     await resetBonuses();
+    await resetSalaries();
     resetProfile();
     setActiveTab("dashboard");
   };
 
-  if (profileLoading || expensesLoading || bonusesLoading) {
+  if (profileLoading || salariesLoading || expensesLoading || bonusesLoading) {
     return (
       <div style={styles.loading}>
         <div style={styles.spinner} />
@@ -86,13 +89,14 @@ export default function MainPage() {
       <Header month={currentMonth} onMonthChange={setCurrentMonth} />
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
       <IncomeBar
-        income={income}
-        income2={income2}
+        salaries={salaries}
+        totalSalaries={totalSalaries}
+        onUpdateSalary={updateSalary}
+        onAddSalary={addSalary}
+        onDeleteSalary={deleteSalary}
         totalBonuses={totalBonuses}
         totalIncome={totalIncome}
         remaining={remaining}
-        onUpdateIncome={updateIncome}
-        onUpdateIncome2={updateIncome2}
         bonuses={bonuses}
         onAddBonus={addBonus}
         onDeleteBonus={deleteBonus}

@@ -1,37 +1,76 @@
 import { useState, useRef } from "react";
-import { Pencil, Plus, Trash2, Users, Gift } from "lucide-react";
+import { Pencil, Plus, Trash2, Users, Gift, Check, X } from "lucide-react";
 import { fmt } from "../lib/format";
 import styles from "../styles/styles";
 
-function InlineEdit({ label, value, onSave, color }) {
-  const [editing, setEditing] = useState(false);
-  const inputRef = useRef(null);
+function SalaryRow({ salary, onUpdate, onDelete }) {
+  const [editingAmount, setEditingAmount] = useState(false);
+  const [editingLabel, setEditingLabel] = useState(false);
+  const amountRef = useRef(null);
+  const labelRef = useRef(null);
 
-  const save = (v) => {
-    onSave(parseFloat(v) || 0);
-    setEditing(false);
+  const saveAmount = (v) => {
+    onUpdate(salary.id, { amount: parseFloat(v) || 0 });
+    setEditingAmount(false);
+  };
+
+  const saveLabel = (v) => {
+    const trimmed = v.trim();
+    if (trimmed) onUpdate(salary.id, { label: trimmed });
+    setEditingLabel(false);
   };
 
   return (
-    <div style={{ marginBottom: 4 }}>
-      <span style={styles.incomeLabel}>{label}</span>
-      {editing ? (
+    <div style={{ marginBottom: 6 }}>
+      {/* Label editable */}
+      {editingLabel ? (
+        <div style={{ display: "flex", gap: 4, alignItems: "center", marginBottom: 4 }}>
+          <input
+            ref={labelRef}
+            defaultValue={salary.label}
+            onKeyDown={(e) => { if (e.key === "Enter") saveLabel(e.target.value); if (e.key === "Escape") setEditingLabel(false); }}
+            style={{ ...styles.input, padding: "3px 8px", fontSize: 11, width: 140 }}
+            autoFocus
+          />
+          <button onClick={() => saveLabel(labelRef.current?.value)} style={{ ...styles.actionBtn, padding: 2 }}>
+            <Check size={10} color="#4A9B7F" />
+          </button>
+          <button onClick={() => setEditingLabel(false)} style={{ ...styles.actionBtn, padding: 2 }}>
+            <X size={10} color="#666" />
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span
+            onClick={() => setEditingLabel(true)}
+            style={{ ...styles.incomeLabel, cursor: "pointer", marginBottom: 2 }}
+            title="Clic para renombrar"
+          >
+            {salary.label}
+          </span>
+          <button onClick={() => onDelete(salary.id)} style={{ ...styles.actionBtn, padding: 1, opacity: 0.4 }} className="btn-hover">
+            <Trash2 size={9} color="#666" />
+          </button>
+        </div>
+      )}
+      {/* Amount editable */}
+      {editingAmount ? (
         <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ color: "#666", fontFamily: "Space Mono", fontSize: 14 }}>$</span>
           <input
-            ref={inputRef}
+            ref={amountRef}
             type="number"
-            defaultValue={value || ""}
-            onKeyDown={(e) => { if (e.key === "Enter") save(e.target.value); }}
+            defaultValue={salary.amount || ""}
+            onKeyDown={(e) => { if (e.key === "Enter") saveAmount(e.target.value); }}
             style={{ ...styles.incomeInput, fontSize: 16, maxWidth: 130 }}
             autoFocus
           />
-          <button onClick={() => save(inputRef.current?.value)} style={styles.smallBtn} className="btn-hover">OK</button>
+          <button onClick={() => saveAmount(amountRef.current?.value)} style={styles.smallBtn} className="btn-hover">OK</button>
         </div>
       ) : (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ ...styles.incomeValue, fontSize: 18, color: color || "#fff" }} className="r-income-value">{fmt(value)}</span>
-          <button onClick={() => setEditing(true)} style={styles.editBtn} className="btn-hover">
+          <span style={{ ...styles.incomeValue, fontSize: 18, color: "#fff" }} className="r-income-value">{fmt(Number(salary.amount))}</span>
+          <button onClick={() => setEditingAmount(true)} style={styles.editBtn} className="btn-hover">
             <Pencil size={10} />
           </button>
         </div>
@@ -41,8 +80,8 @@ function InlineEdit({ label, value, onSave, color }) {
 }
 
 export default function IncomeBar({
-  income, income2, totalBonuses, totalIncome, remaining,
-  onUpdateIncome, onUpdateIncome2,
+  salaries, totalSalaries, onUpdateSalary, onAddSalary, onDeleteSalary,
+  totalBonuses, totalIncome, remaining,
   bonuses, onAddBonus, onDeleteBonus,
 }) {
   const [showBonusForm, setShowBonusForm] = useState(false);
@@ -62,12 +101,31 @@ export default function IncomeBar({
       {/* Salarios */}
       <div style={{ display: "flex", gap: 24, marginBottom: 16, flexWrap: "wrap" }} className="r-income-bar">
         <div style={{ flex: 1, minWidth: 180 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-            <Users size={14} color="#7CC6E8" />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#7CC6E8", fontFamily: "Space Mono" }}>Salarios</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Users size={14} color="#7CC6E8" />
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#7CC6E8", fontFamily: "Space Mono" }}>Salarios</span>
+            </div>
+            <button
+              onClick={() => onAddSalary()}
+              style={{ ...styles.editBtn, padding: "2px 8px" }}
+              className="btn-hover"
+            >
+              <Plus size={10} />
+            </button>
           </div>
-          <InlineEdit label="Tu salario" value={income} onSave={onUpdateIncome} color="#fff" />
-          <InlineEdit label="Salario esposa" value={income2} onSave={onUpdateIncome2} color="#fff" />
+          {salaries.length === 0 ? (
+            <span style={{ fontSize: 12, color: "#555" }}>Agrega un salario</span>
+          ) : (
+            salaries.map((s) => (
+              <SalaryRow key={s.id} salary={s} onUpdate={onUpdateSalary} onDelete={onDeleteSalary} />
+            ))
+          )}
+          {totalSalaries > 0 && salaries.length > 1 && (
+            <div style={{ borderTop: "1px solid #222", marginTop: 6, paddingTop: 4 }}>
+              <span style={{ fontFamily: "Space Mono", fontSize: 13, color: "#7CC6E8", fontWeight: 700 }}>Total salarios: {fmt(totalSalaries)}</span>
+            </div>
+          )}
         </div>
 
         <div style={{ width: 1, background: "#222", alignSelf: "stretch" }} className="r-income-divider" />
